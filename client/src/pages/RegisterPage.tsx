@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import type { FormEvent } from "react";
 
 import {
@@ -18,26 +19,38 @@ import axios from "axios";
 import { useAuth } from "../auth/AuthContext";
 
 export default function RegisterPage() {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
-  const { register } = useAuth();
+  const { register } =
+    useAuth();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] =
+    useState("");
+
+  const [email, setEmail] =
+    useState("");
 
   const [password, setPassword] =
     useState("");
 
-  const [confirmPassword, setConfirmPassword] =
+  const [
+    confirmPassword,
+    setConfirmPassword,
+  ] = useState("");
+
+  const [
+    showPassword,
+    setShowPassword,
+  ] = useState(false);
+
+  const [error, setError] =
     useState("");
 
-  const [showPassword, setShowPassword] =
-    useState(false);
-
-  const [error, setError] = useState("");
-
-  const [submitting, setSubmitting] =
-    useState(false);
+  const [
+    submitting,
+    setSubmitting,
+  ] = useState(false);
 
   async function handleSubmit(
     event: FormEvent<HTMLFormElement>
@@ -46,7 +59,33 @@ export default function RegisterPage() {
 
     setError("");
 
-    if (password.length < 6) {
+    const cleanName =
+      name.trim();
+
+    const cleanEmail =
+      email
+        .trim()
+        .toLowerCase();
+
+    if (!cleanName) {
+      setError(
+        "Please enter your name."
+      );
+
+      return;
+    }
+
+    if (!cleanEmail) {
+      setError(
+        "Please enter your email address."
+      );
+
+      return;
+    }
+
+    if (
+      password.length < 6
+    ) {
       setError(
         "Password must be at least 6 characters."
       );
@@ -54,8 +93,13 @@ export default function RegisterPage() {
       return;
     }
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+    if (
+      password !==
+      confirmPassword
+    ) {
+      setError(
+        "Passwords do not match."
+      );
 
       return;
     }
@@ -64,8 +108,8 @@ export default function RegisterPage() {
 
     try {
       await register(
-        name,
-        email,
+        cleanName,
+        cleanEmail,
         password
       );
 
@@ -73,9 +117,41 @@ export default function RegisterPage() {
         replace: true,
       });
     } catch (error) {
-      if (axios.isAxiosError(error)) {
+      console.error(
+        "Registration failed:",
+        error
+      );
+
+      if (
+        axios.isAxiosError(
+          error
+        )
+      ) {
+        if (
+          error.code ===
+          "ECONNABORTED"
+        ) {
+          setError(
+            "The server took too long to respond. Please try again."
+          );
+        } else if (
+          !error.response
+        ) {
+          setError(
+            "Unable to connect to the server. Please try again."
+          );
+        } else {
+          setError(
+            error.response.data
+              ?.message ||
+              "Unable to create account."
+          );
+        }
+      } else if (
+        error instanceof Error
+      ) {
         setError(
-          error.response?.data?.message ||
+          error.message ||
             "Unable to create account."
         );
       } else {
@@ -95,18 +171,20 @@ export default function RegisterPage() {
           <div className="hidden bg-[#172B4D] p-12 text-white lg:flex lg:flex-col lg:justify-between">
             <div>
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#A8D8F0] text-[#172B4D]">
-                <BriefcaseBusiness size={24} />
+                <BriefcaseBusiness
+                  size={24}
+                />
               </div>
 
               <h1 className="mt-8 max-w-sm text-4xl font-semibold leading-tight">
-                One place for every job
-                opportunity.
+                One place for every
+                job opportunity.
               </h1>
 
               <p className="mt-5 max-w-md leading-7 text-blue-100/80">
-                Stay organised from your first
-                application until your final
-                offer.
+                Stay organised from
+                your first application
+                until your final offer.
               </p>
             </div>
 
@@ -118,7 +196,9 @@ export default function RegisterPage() {
           <div className="px-7 py-10 sm:px-12 sm:py-14">
             <div className="lg:hidden">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#DDF7F8] text-[#172B4D]">
-                <BriefcaseBusiness size={22} />
+                <BriefcaseBusiness
+                  size={22}
+                />
               </div>
             </div>
 
@@ -132,8 +212,9 @@ export default function RegisterPage() {
               </h2>
 
               <p className="mt-3 text-sm leading-6 text-gray-500">
-                Start tracking your job search
-                in one organised workspace.
+                Start tracking your
+                job search in one
+                organised workspace.
               </p>
             </div>
 
@@ -144,7 +225,9 @@ export default function RegisterPage() {
             )}
 
             <form
-              onSubmit={handleSubmit}
+              onSubmit={
+                handleSubmit
+              }
               className="mt-8 space-y-5"
             >
               <div>
@@ -161,8 +244,13 @@ export default function RegisterPage() {
                   required
                   autoComplete="name"
                   value={name}
-                  onChange={(event) =>
-                    setName(event.target.value)
+                  onChange={(
+                    event
+                  ) =>
+                    setName(
+                      event.target
+                        .value
+                    )
                   }
                   placeholder="Your name"
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-[#47C6CE] focus:ring-4 focus:ring-[#DDF7F8]"
@@ -183,8 +271,13 @@ export default function RegisterPage() {
                   required
                   autoComplete="email"
                   value={email}
-                  onChange={(event) =>
-                    setEmail(event.target.value)
+                  onChange={(
+                    event
+                  ) =>
+                    setEmail(
+                      event.target
+                        .value
+                    )
                   }
                   placeholder="you@example.com"
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-[#47C6CE] focus:ring-4 focus:ring-[#DDF7F8]"
@@ -211,9 +304,12 @@ export default function RegisterPage() {
                     minLength={6}
                     autoComplete="new-password"
                     value={password}
-                    onChange={(event) =>
+                    onChange={(
+                      event
+                    ) =>
                       setPassword(
-                        event.target.value
+                        event.target
+                          .value
                       )
                     }
                     placeholder="Minimum 6 characters"
@@ -224,15 +320,25 @@ export default function RegisterPage() {
                     type="button"
                     onClick={() =>
                       setShowPassword(
-                        !showPassword
+                        (current) =>
+                          !current
                       )
                     }
                     className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-gray-400 hover:bg-gray-50"
+                    aria-label={
+                      showPassword
+                        ? "Hide password"
+                        : "Show password"
+                    }
                   >
                     {showPassword ? (
-                      <EyeOff size={18} />
+                      <EyeOff
+                        size={18}
+                      />
                     ) : (
-                      <Eye size={18} />
+                      <Eye
+                        size={18}
+                      />
                     )}
                   </button>
                 </div>
@@ -252,10 +358,15 @@ export default function RegisterPage() {
                   required
                   minLength={6}
                   autoComplete="new-password"
-                  value={confirmPassword}
-                  onChange={(event) =>
+                  value={
+                    confirmPassword
+                  }
+                  onChange={(
+                    event
+                  ) =>
                     setConfirmPassword(
-                      event.target.value
+                      event.target
+                        .value
                     )
                   }
                   placeholder="Enter password again"
@@ -265,7 +376,9 @@ export default function RegisterPage() {
 
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={
+                  submitting
+                }
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#172B4D] px-4 py-3 font-medium text-white transition hover:bg-[#213B66] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {submitting
@@ -273,13 +386,17 @@ export default function RegisterPage() {
                   : "Create account"}
 
                 {!submitting && (
-                  <ArrowRight size={18} />
+                  <ArrowRight
+                    size={18}
+                  />
                 )}
               </button>
             </form>
 
             <p className="mt-7 text-center text-sm text-gray-500">
-              Already have an account?{" "}
+              Already have an
+              account?{" "}
+
               <Link
                 to="/login"
                 className="font-semibold text-[#1B7A89] hover:text-[#172B4D]"

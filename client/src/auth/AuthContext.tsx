@@ -60,9 +60,10 @@ export function AuthProvider({
     useState(true);
 
   async function refreshUser() {
-    const token = localStorage.getItem(
-      "jobTrackerToken"
-    );
+    const token =
+      localStorage.getItem(
+        "jobTrackerToken"
+      );
 
     if (!token) {
       setUser(null);
@@ -85,9 +86,11 @@ export function AuthProvider({
 
   useEffect(() => {
     async function initialiseAuth() {
-      await refreshUser();
-
-      setLoading(false);
+      try {
+        await refreshUser();
+      } finally {
+        setLoading(false);
+      }
     }
 
     initialiseAuth();
@@ -98,17 +101,37 @@ export function AuthProvider({
     password: string
   ) {
     const response =
-      await api.post("/auth/login", {
-        email,
-        password,
-      });
+      await api.post(
+        "/auth/login",
+        {
+          email: email
+            .trim()
+            .toLowerCase(),
+          password,
+        }
+      );
+
+    const token =
+      response.data.token;
+
+    const loggedInUser =
+      response.data.user;
+
+    if (
+      !token ||
+      !loggedInUser
+    ) {
+      throw new Error(
+        "Invalid login response from server."
+      );
+    }
 
     localStorage.setItem(
       "jobTrackerToken",
-      response.data.token
+      token
     );
 
-    setUser(response.data.user);
+    setUser(loggedInUser);
   }
 
   async function register(
@@ -117,18 +140,38 @@ export function AuthProvider({
     password: string
   ) {
     const response =
-      await api.post("/auth/register", {
-        name,
-        email,
-        password,
-      });
+      await api.post(
+        "/auth/register",
+        {
+          name: name.trim(),
+          email: email
+            .trim()
+            .toLowerCase(),
+          password,
+        }
+      );
+
+    const token =
+      response.data.token;
+
+    const registeredUser =
+      response.data.user;
+
+    if (
+      !token ||
+      !registeredUser
+    ) {
+      throw new Error(
+        "Invalid registration response from server."
+      );
+    }
 
     localStorage.setItem(
       "jobTrackerToken",
-      response.data.token
+      token
     );
 
-    setUser(response.data.user);
+    setUser(registeredUser);
   }
 
   async function updateProfile(
@@ -136,10 +179,15 @@ export function AuthProvider({
     email: string
   ) {
     const response =
-      await api.put("/auth/profile", {
-        name,
-        email,
-      });
+      await api.put(
+        "/auth/profile",
+        {
+          name: name.trim(),
+          email: email
+            .trim()
+            .toLowerCase(),
+        }
+      );
 
     const updatedUser: User =
       response.data.user;
@@ -151,10 +199,12 @@ export function AuthProvider({
 
   async function logout() {
     try {
-      await api.post("/auth/logout");
+      await api.post(
+        "/auth/logout"
+      );
     } catch {
-      // Local logout should still happen
-      // if the server request fails.
+      // Local logout should still work
+      // if the API request fails.
     } finally {
       localStorage.removeItem(
         "jobTrackerToken"
@@ -182,7 +232,8 @@ export function AuthProvider({
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
+  const context =
+    useContext(AuthContext);
 
   if (!context) {
     throw new Error(

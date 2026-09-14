@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Production builds
+dist/
+client/dist/
+server/dist/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+client/.env
+server/.env
+
+# Prisma generated client
+server/src/generated/prisma/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Prisma AI/helper folders
+server/.claude/
+server/.windsurf/
+server/.agents/
+server/.cursor/
+server/.devin/
+server/skills-lock.json

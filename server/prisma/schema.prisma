@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  passwordHash String        @map("password_hash")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  applications Application[]
+
+  @@map("users")
+}
+
+model Application {
+  id               Int       @id @default(autoincrement())
+  userId           Int       @map("user_id")
+  companyName      String    @map("company_name")
+  position         String
+  location         String?
+  workMode         String?   @map("work_mode")
+  employmentType   String?   @map("employment_type")
+  dateApplied      DateTime  @map("date_applied")
+  platform         String?
+  applicationUrl   String?   @map("application_url")
+  companyUrl       String?   @map("company_url")
+  status           String    @default("Applied")
+  salary           String?
+  jobDescription   String?   @map("job_description")
+  requirements     String?
+  responsibilities String?
+  skills           String?
+  followUpDate     DateTime? @map("follow_up_date")
+  remarks          String?
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([dateApplied])
+
+  @@map("applications")
+}

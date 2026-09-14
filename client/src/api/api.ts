@@ -1,16 +1,13 @@
 import axios from "axios";
 
-const envApiUrl =
-  import.meta.env.VITE_API_URL?.trim();
-
 const API_BASE_URL =
-  envApiUrl ||
-  (window.location.hostname === "localhost"
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1"
     ? "http://localhost:5000/api"
-    : "https://job-tracker-xj7p.onrender.com/api");
+    : "https://job-tracker-xj7p.onrender.com/api";
 
 export const api = axios.create({
-  baseURL: API_BASE_URL.replace(/\/+$/, ""),
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
